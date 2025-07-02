@@ -8,7 +8,7 @@ A simple Streamlit application that converts PDF files to images and sends them 
 - 📧 Send images via email with custom message
 - 🎨 Automatic image resizing and optimization
 - 📅 Automatic subject line generation with next Friday's date
-- 🔒 Secure credential management using environment variables
+- 🔒 Secure credential management using Streamlit secrets
 - 📱 Responsive web interface
 - ☁️ **Microsoft Graph API support** with inline attachments
 - 🔧 **Configurable image quality and size** via UI controls
@@ -50,26 +50,31 @@ cd pdf_converter
 pip install -r requirements.txt
 ```
 
-3. **Set up environment variables:**
+3. **Set up configuration:**
 ```bash
-cp .env.example .env
+cp .streamlit/secrets.toml.template .streamlit/secrets.toml
 ```
 
-Edit `.env` file with your email credentials:
-```bash
-SENDER_EMAIL=your-email@domain.com
-SENDER_PASSWORD=your-app-password
-RECIPIENT_EMAIL=recipient@domain.com
-RECIPIENT_OPTIONS=sgoldman@mpmcapital.com,jharrison@mpmcapital.com,cbardon.25f6d@m.evernote.com
-SENDER_TYPE=microsoft  # or gmail, yahoo, microsoft_graph
+Edit `.streamlit/secrets.toml` file with your credentials:
+```toml
+[passwords]
+admin = "your-secure-password-here"
+cbardon = "another-secure-password"
 
-# For Microsoft Graph API (if SENDER_TYPE=microsoft_graph):
-MICROSOFT_TENANT_ID=your-tenant-id
-MICROSOFT_CLIENT_ID=your-client-id
-MICROSOFT_CLIENT_SECRET=your-client-secret
+# Email Configuration
+sender_email = "your-email@domain.com"
+recipient_email = "recipient@domain.com"
+recipient_options = ["recipient1@domain.com", "recipient2@domain.com", "recipient3@domain.com"]
+sender_type = "microsoft_graph"  # Options: microsoft, gmail, yahoo, microsoft_graph
 
-# Optional: Control attachment method for Microsoft Graph API:
-USE_MIME_ATTACHMENTS=true  # or false
+# Required if SENDER_TYPE=microsoft_graph
+microsoft_tenant_id = "your-tenant-id"
+microsoft_client_id = "your-client-id"
+microsoft_client_secret = "your-client-secret"
+use_mime_attachments = false
+
+# Required if SENDER_TYPE in [microsoft, gmail, yahoo]
+# sender_password = "your-app-password"
 ```
 
 ### Option 2: Using conda (Recommended for local development)
@@ -86,12 +91,90 @@ conda env create -f environment.yml
 conda activate pdf_email_app
 ```
 
-3. **Set up environment variables:**
+3. **Set up configuration:**
 ```bash
-cp .env.example .env
+cp .streamlit/secrets.toml.template .streamlit/secrets.toml
 ```
 
-Edit `.env` file with your email credentials (same as above).
+Edit `.streamlit/secrets.toml` file with your credentials (same as above).
+
+## Deployment
+
+### Streamlit Community Cloud Deployment
+
+This app is configured for easy deployment to Streamlit Community Cloud.
+
+#### 1. Prepare Your Repository
+
+- ✅ Ensure `streamlit_app.py` exists in the root directory (entry point)
+- ✅ Verify `requirements.txt` contains all dependencies
+- ✅ Check that `packages.txt` includes system dependencies (Poppler)
+- ✅ Commit the template file `.streamlit/secrets.toml.template`
+
+#### 2. Deploy to Streamlit Community Cloud
+
+1. **Push your code to GitHub:**
+```bash
+git add .
+git commit -m "Prepare for Streamlit Cloud deployment"
+git push origin main
+```
+
+2. **Go to [Streamlit Community Cloud](https://share.streamlit.io/)**
+
+3. **Connect your repository:**
+   - Click "New app"
+   - Connect your GitHub account
+   - Select your repository
+   - Set the main file path to: `streamlit_app.py`
+
+4. **Configure secrets:**
+   - In your app settings, go to "Secrets"
+   - Add the contents of your `.streamlit/secrets.toml` file
+   - **Never commit the actual secrets file to GitHub!**
+
+#### 3. Secrets Configuration for Streamlit Cloud
+
+Add this to your Streamlit Cloud secrets (in the web interface):
+
+```toml
+[passwords]
+admin = "your-actual-secure-password"
+cbardon = "your-actual-secure-password"
+
+# Email Configuration
+sender_email = "your-actual-email@domain.com"
+recipient_email = "your-actual-recipient@domain.com"
+recipient_options = ["actual1@domain.com", "actual2@domain.com", "actual3@domain.com"]
+sender_type = "microsoft_graph"
+
+# Microsoft Graph API (if using)
+microsoft_tenant_id = "your-actual-tenant-id"
+microsoft_client_id = "your-actual-client-id"
+microsoft_client_secret = "your-actual-client-secret"
+use_mime_attachments = false
+
+# SMTP Password (if using SMTP)
+# sender_password = "your-actual-app-password"
+```
+
+#### 4. Deployment Files
+
+The following files are used for deployment:
+
+- **`streamlit_app.py`** - Main entry point for Streamlit Cloud
+- **`requirements.txt`** - Python dependencies
+- **`packages.txt`** - System dependencies (Poppler)
+- **`.streamlit/config.toml`** - Streamlit configuration
+- **`.streamlit/secrets.toml.template`** - Template for secrets (committed)
+
+#### 5. Security Best Practices for Deployment
+
+- ✅ **Never commit** `.streamlit/secrets.toml` to GitHub
+- ✅ Use strong, unique passwords for authentication
+- ✅ Store all sensitive credentials in Streamlit Cloud secrets
+- ✅ Regularly rotate passwords and API keys
+- ✅ Use environment-specific configurations
 
 ## Dependency Management
 
@@ -113,23 +196,25 @@ conda activate pdf_email_app
 
 2. **Run the application:**
 ```bash
-streamlit run src/main.py
+streamlit run streamlit_app.py
 ```
 
 3. **Open your browser** and navigate to the provided URL (usually `http://localhost:8501`)
 
-4. **Configure your email:**
+4. **Login with your credentials** (configured in secrets)
+
+5. **Configure your email:**
    - Select topic type (Non-ONC, ONC, or No Date)
    - Enter a subtopic
    - Write your message body
 
-5. **Customize image settings:**
+6. **Customize image settings:**
    - Select maximum image size (600x600 to 1280x1280)
    - Adjust image quality (10-100)
 
-6. **Upload a PDF file** and wait for conversion
+7. **Upload a PDF file** and wait for conversion
 
-7. **Preview the email** and click "Send Email"
+8. **Preview the email** and click "Send Email"
 
 ## Email Provider Setup
 
