@@ -60,6 +60,7 @@ Edit `.env` file with your email credentials:
 SENDER_EMAIL=your-email@domain.com
 SENDER_PASSWORD=your-app-password
 RECIPIENT_EMAIL=recipient@domain.com
+RECIPIENT_OPTIONS=sgoldman@mpmcapital.com,jharrison@mpmcapital.com,cbardon.25f6d@m.evernote.com
 SENDER_TYPE=microsoft  # or gmail, yahoo, microsoft_graph
 
 # For Microsoft Graph API (if SENDER_TYPE=microsoft_graph):
@@ -198,10 +199,58 @@ The app supports two methods for Microsoft Graph API:
 - ✅ No hardcoded passwords in source code
 - ✅ File size limits (50MB max)
 - ✅ File type validation
-- ✅ Temporary file cleanup
-- ✅ Error handling and validation
-- ✅ Microsoft Graph API token management
-- ✅ Secure attachment handling
+- ✅ **User authentication** with secure login system
+
+## Authentication Setup
+
+The app now includes built-in authentication to protect access to the PDF converter.
+
+### 1. Configure Users
+
+Edit `.streamlit/secrets.toml` and add your users:
+```toml
+[passwords]
+admin = "your-secure-password-here"
+user1 = "another-secure-password"
+user2 = "third-secure-password"
+```
+
+**Note:** Use strong, unique passwords. You can generate secure passwords using:
+```bash
+openssl rand -base64 32
+```
+
+### 2. Security Best Practices
+
+- ✅ **Never commit** `.streamlit/secrets.toml` to version control
+- ✅ Use strong, unique passwords for each user
+- ✅ Regularly rotate passwords
+- ✅ Limit access to authorized users only
+- ✅ Monitor login attempts
+
+### 3. Streamlit Cloud Deployment
+
+When deploying to Streamlit Cloud:
+
+1. **Add secrets** in the Streamlit Cloud dashboard:
+   - Go to your app settings
+   - Navigate to "Secrets"
+   - Add the contents of your `secrets.toml` file
+
+2. **Example secrets configuration:**
+```toml
+[passwords]
+admin = "your-secure-password"
+user1 = "another-secure-password"
+```
+
+### 4. Authentication Features
+
+- 🔐 **Secure login** with username/password
+- 👤 **Session management** - users stay logged in
+- 🚪 **Logout functionality** in sidebar
+- ⚠️ **Access control** - unauthenticated users cannot access the app
+- 🔄 **Automatic redirect** to login page
 
 ## Project Structure
 

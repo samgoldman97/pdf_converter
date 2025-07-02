@@ -28,6 +28,44 @@ def setup_page():
     )
 
 
+def authenticate_user():
+    """Authenticate user using Streamlit's built-in authentication."""
+    # Check if user is already authenticated
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    
+    if not st.session_state.authenticated:
+        st.title("🔐 Authentication Required")
+        st.markdown("Please log in to access the PDF to Email Converter.")
+        
+        # Create login form
+        with st.form("login_form"):
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            submit_button = st.form_submit_button("Login")
+            
+            if submit_button:
+                # Check credentials against secrets
+                if username in st.secrets["passwords"] and st.secrets["passwords"][username] == password:
+                    st.session_state.authenticated = True
+                    st.session_state.username = username
+                    st.success("✅ Login successful!")
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid username or password")
+        
+        st.stop()
+    
+    # Show logout button in sidebar
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown(f"**Logged in as:** {st.session_state.username}")
+        if st.button("Logout"):
+            st.session_state.authenticated = False
+            st.session_state.username = None
+            st.rerun()
+
+
 def show_header():
     """Display app header and description."""
     st.title(APP_CONFIG["title"])
@@ -73,6 +111,20 @@ def create_email_form():
     """Create the email composition form."""
     st.subheader("Email Configuration")
     
+    # Recipient email dropdown - get options from config
+    recipient_options = EMAIL_CONFIG["recipient_options"]
+    
+    # Add the default recipient from config if it's not already in the list
+    default_recipient = EMAIL_CONFIG["recipient_email"]
+    if default_recipient and default_recipient not in recipient_options:
+        recipient_options.append(default_recipient)
+    
+    recipient_email = st.selectbox(
+        "Select recipient email",
+        recipient_options,
+        help="Choose the recipient for the email"
+    )
+    
     col1, col2 = st.columns(2)
     
     with col1:
@@ -94,7 +146,7 @@ def create_email_form():
         help="The main content of your email"
     )
     
-    return topic_type, subtopic, message_body
+    return topic_type, subtopic, message_body, recipient_email
 
 
 def handle_file_upload():
@@ -161,12 +213,13 @@ def handle_file_upload():
 def main():
     """Main application function."""
     setup_page()
+    authenticate_user()
     show_header()
     validate_environment()
     
     # Create email form
-    topic_type, subtopic, message_body = create_email_form()
-    email_sender = EmailSender()
+    topic_type, subtopic, message_body, recipient_email = create_email_form()
+    email_sender = EmailSender(recipient_email)
     subject = email_sender.generate_subject(topic_type, subtopic)
 
     # Display subject
@@ -199,7 +252,7 @@ def main():
             pass
         
         # Generate subject
-        email_sender = EmailSender()
+        email_sender = EmailSender(recipient_email)
         subject = email_sender.generate_subject(topic_type, subtopic)
         
         # Preview email

@@ -20,19 +20,24 @@ from config import EMAIL_CONFIG
 class EmailSender:
     """Handles email composition and sending."""
     
-    def __init__(self):
+    def __init__(self, recipient_email: str = None):
         self.smtp_hosts = EMAIL_CONFIG["smtp_hosts"]
         self.smtp_port = EMAIL_CONFIG["smtp_port"]
         self.sender_email = EMAIL_CONFIG["sender_email"]
         self.sender_password = EMAIL_CONFIG["sender_password"]
         self.sender_type = EMAIL_CONFIG["sender_type"]
-        self.recipient_email = EMAIL_CONFIG["recipient_email"]
+        # Use provided recipient email or fall back to default from config
+        self.recipient_email = recipient_email if recipient_email else EMAIL_CONFIG["recipient_email"]
         # Microsoft Graph API configuration
         self.microsoft_tenant_id = EMAIL_CONFIG["microsoft_tenant_id"]
         self.microsoft_client_id = EMAIL_CONFIG["microsoft_client_id"]
         self.microsoft_client_secret = EMAIL_CONFIG["microsoft_client_secret"]
         # Configuration for Microsoft Graph attachment method
         self.use_mime_attachments = EMAIL_CONFIG.get("use_mime_attachments", True)
+    
+    def set_recipient_email(self, recipient_email: str) -> None:
+        """Set or change the recipient email address."""
+        self.recipient_email = recipient_email
     
     def generate_subject(self, topic_type: str, subtopic: str) -> str:
         """Generate email subject with next Friday's date."""

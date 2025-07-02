@@ -30,6 +30,8 @@ EMAIL_CONFIG = {
     "sender_password": os.getenv("SENDER_PASSWORD", ""),
     "sender_type": os.getenv("SENDER_TYPE", "microsoft"),
     "recipient_email": os.getenv("RECIPIENT_EMAIL", ""),
+    # Recipient options for dropdown (comma-separated list)
+    "recipient_options": [email.strip() for email in os.getenv("RECIPIENT_OPTIONS", "sgoldman@mpmcapital.com").split(",") if email.strip()],
     # Microsoft Graph API configuration
     "microsoft_tenant_id": os.getenv("MICROSOFT_TENANT_ID", ""),
     "microsoft_client_id": os.getenv("MICROSOFT_CLIENT_ID", ""),
