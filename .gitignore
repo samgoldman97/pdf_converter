@@ -1,4 +1,5 @@
-# Custome
+# Custom files
+railway_env_vars.txt
 scratch
 
 # Streamlit secrets (CRITICAL - never commit the actual secrets file!)

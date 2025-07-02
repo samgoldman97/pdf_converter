@@ -133,7 +133,21 @@ git push origin main
    - Add the contents of your `.streamlit/secrets.toml` file
    - **Never commit the actual secrets file to GitHub!**
 
-#### 3. Secrets Configuration for Streamlit Cloud
+#### 3. Railway Deployment (Alternative)
+
+For private repositories, Railway is an excellent alternative:
+
+1. **Connect your repository** to Railway
+2. **Use the conversion script** to convert secrets:
+   ```bash
+   python convert_secrets.py
+   ```
+3. **Copy the generated environment variables** to Railway's Variables tab
+4. **Deploy** - Railway auto-detects it's a Python app
+
+**Note:** The `convert_secrets.py` script automatically converts your `.streamlit/secrets.toml` to Railway's environment variable format, making deployment seamless.
+
+#### 4. Secrets Configuration for Streamlit Cloud
 
 Add this to your Streamlit Cloud secrets (in the web interface):
 
@@ -158,7 +172,7 @@ use_mime_attachments = false
 # sender_password = "your-actual-app-password"
 ```
 
-#### 4. Deployment Files
+#### 5. Deployment Files
 
 The following files are used for deployment:
 
@@ -168,7 +182,7 @@ The following files are used for deployment:
 - **`.streamlit/config.toml`** - Streamlit configuration
 - **`.streamlit/secrets.toml.template`** - Template for secrets (committed)
 
-#### 5. Security Best Practices for Deployment
+#### 6. Security Best Practices for Deployment
 
 - ✅ **Never commit** `.streamlit/secrets.toml` to GitHub
 - ✅ Use strong, unique passwords for authentication
